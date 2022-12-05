@@ -68,7 +68,9 @@ class TasksController extends Controller
      */
     public function update(Request $request, Task $task)
     {
-        $this->isNotAuthorized($task);
+        if (Auth::user()->id !== $task->user_id){
+            return $this->error('', 'You are not authorized', 403);
+        }
         $task->update($request->all());
         return new TasksResource($task);
     }
@@ -81,9 +83,9 @@ class TasksController extends Controller
      */
     public function destroy(Task $task)
     {
-        $this->isNotAuthorized($task);
-        $task->delete();
-        return $this->success($task->name, 'Deleted successfully',200);
+
+
+        return $this->isNotAuthorized($task)?$this->isNotAuthorized($task):$task->delete();
     }
 
     private function isNotAuthorized($task)
